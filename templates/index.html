@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LED Control</title>
+    <!-- Link to the CSS file -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>LED Control</h1>
+        {% if status %}
+            <p class="status">The LED is currently: <strong>{{ status }}</strong></p>
+        {% else %}
+            <p class="status">The LED status is unknown.</p>
+        {% endif %}
+        
+        <!-- Display the timestamp of when the LED was toggled -->
+        <p>Last toggled at: <strong>{{ timestamp }}</strong></p>
+
+        <form action="/toggle" method="post">
+            <button type="submit">Toggle LED</button>
+        </form>
+    </div>
+</body>
+</html>
