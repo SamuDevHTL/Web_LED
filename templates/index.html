@@ -6,36 +6,29 @@
     <title>LED Control</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
     <script>
-        function updateBackground() {
-            // Fetch light intensity data
-            fetch('/light')
-                .then(response => response.json())
-                .then(data => {
-                    // Update the background color
-                    document.body.className = data.background_color;
+        async function updateBackground() {
+            try {
+                const response = await fetch('/light');
+                const { lux, background_color } = await response.json();
+                
+                // Entfernen der Nachkommastellen und Kommas
+                const luxWithoutDecimals = Math.floor(lux); // Runden auf ganze Zahl
 
-                    // Optionally, update the light intensity display
-                    const luxDisplay = document.getElementById('lux-display');
-                    if (luxDisplay) {
-                        luxDisplay.textContent = `Current Light Intensity: ${data.lux} lux`;
-                    }
-                })
-                .catch(error => console.error('Error fetching light data:', error));
+                // Hintergrundfarbe und Lux-Anzeige aktualisieren
+                document.body.className = background_color;
+                document.getElementById('lux-display').textContent = `Current Light Intensity: ${luxWithoutDecimals} lux`;
+            } catch (error) {
+                console.error('Error fetching light data:', error);
+            }
         }
 
-        // Periodically update the background every 2 seconds
-        setInterval(updateBackground, 100);
+        setInterval(updateBackground, 100); // Alle 100 ms aktualisieren
     </script>
 </head>
 <body class="{{ background_color }}">
     <div class="container">
         <h1>LED Control</h1>
-        {% if status %}
-            <p class="status">The LED is currently: <strong>{{ status }}</strong></p>
-        {% else %}
-            <p class="status">The LED status is unknown.</p>
-        {% endif %}
-        
+        <p class="status">{{ 'The LED is currently: ' + status if status else 'The LED status is unknown.' }}</p>
         <p>Last toggled at: <strong>{{ timestamp }}</strong></p>
         <p id="lux-display">Current Light Intensity: <strong>{{ lux }} lux</strong></p>
 
