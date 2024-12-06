@@ -4,10 +4,30 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LED Control</title>
-    <!-- Link to the CSS file -->
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <script>
+        function updateBackground() {
+            // Fetch light intensity data
+            fetch('/light')
+                .then(response => response.json())
+                .then(data => {
+                    // Update the background color
+                    document.body.className = data.background_color;
+
+                    // Optionally, update the light intensity display
+                    const luxDisplay = document.getElementById('lux-display');
+                    if (luxDisplay) {
+                        luxDisplay.textContent = `Current Light Intensity: ${data.lux} lux`;
+                    }
+                })
+                .catch(error => console.error('Error fetching light data:', error));
+        }
+
+        // Periodically update the background every 2 seconds
+        setInterval(updateBackground, 100);
+    </script>
 </head>
-<body>
+<body class="{{ background_color }}">
     <div class="container">
         <h1>LED Control</h1>
         {% if status %}
@@ -16,8 +36,8 @@
             <p class="status">The LED status is unknown.</p>
         {% endif %}
         
-        <!-- Display the timestamp of when the LED was toggled -->
         <p>Last toggled at: <strong>{{ timestamp }}</strong></p>
+        <p id="lux-display">Current Light Intensity: <strong>{{ lux }} lux</strong></p>
 
         <form action="/toggle" method="post">
             <button type="submit">Toggle LED</button>
